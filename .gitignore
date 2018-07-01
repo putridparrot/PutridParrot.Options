@@ -1,0 +1,8 @@
+/.vs/PutridParrot.Options/v15/*.suo
+/.vs
+/*.user
+/PutridParrot.Options/bin
+/PutridParrot.Options/obj
+/Tests.PutridParrot.Options.4.7.1/bin
+/Tests.PutridParrot.Options.4.7.1/obj
+/packages
