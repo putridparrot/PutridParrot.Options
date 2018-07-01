@@ -38,8 +38,8 @@ There will be no NullReferenceExceptions with this, so if Read() returned a null
 would return -1.
 
 Whilst the Match method would also allow us to return the Value stored within the Optional&lt;T&gt;, we also have the ```GetValueOrDefault()```
-method which, as per an Nullable<T>, will either return the Value or a default(T) or, if supplied, an alternate default value. This is safer 
-that using the Value property which will throw an exception if you try to get the Value when non has been supplied.
+method which, as per an Nullable&lt;T&gt;, will either return the Value or a default(T) or, if supplied, an alternate default value. This is safer 
+that using the Value property which will throw an exception if you try to get the Value when none has been supplied.
 
 _Note: Many of these methods can easily be replicated with If and other logic statements in C#, but using these methods should remove 
 the need for such checks and supply more readable code._
