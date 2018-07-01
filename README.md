@@ -1,6 +1,6 @@
 # PutridParrot.Options
 
-# Optional<T>
+# Optional&lt;T&gt;
 
 _The Optional&lt;T&gt; class was originally written as a port of the [Java Optional](https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html)
 but re-written to use C# idioms and also with a touch of F# Option type ideas._
