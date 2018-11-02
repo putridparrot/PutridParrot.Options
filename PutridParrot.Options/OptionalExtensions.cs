@@ -6,6 +6,7 @@ namespace PutridParrot.Options
     /// <summary>
     /// Supplies extension methods for the Optional type
     /// </summary>
+    [Obsolete("Option<> should be used in place of Optional")]
     public static class OptionalExtensions
     {
         /// <summary>
