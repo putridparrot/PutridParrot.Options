@@ -10,6 +10,7 @@ namespace PutridParrot.Options
     /// C# idioms etc.
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [Obsolete("Option<> should be used in place of Optional")]
     public sealed class Optional<T> : IEquatable<Optional<T>>
     {
         private readonly T _value;
