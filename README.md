@@ -1,5 +1,13 @@
 # PutridParrot.Options
 
+# Option&lt;T&gt;
+
+The Option class is made to be usable in pattern matching ways and so a little more similar to F#'s Option. Extension 
+methods have been added recreating Optional functionality with the Option class thus extending the functional 
+capabilities. Optional is therefore being deprecated.
+
+All Optional documentation can be applied (in most cases exactly) to the Option class.
+
 # Optional&lt;T&gt;
 
 _The Optional&lt;T&gt; class was originally written as a port of the [Java Optional](https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html)
@@ -44,7 +52,3 @@ that using the Value property which will throw an exception if you try to get th
 _Note: Many of these methods can easily be replicated with If and other logic statements in C#, but using these methods should remove 
 the need for such checks and supply more readable code._
 
-# Option&lt;T&gt;
-
-The Option class is made to be usable in pattern matching ways and so a little more similar to F#'s Option. Extension 
-methods have been added duplicating Optional functionality to extend the functional capabilities.
