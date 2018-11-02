@@ -1,45 +1,58 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace PutridParrot.Options
 {
-    /// <summary>
-    /// Supplies extension methods for the Optional type
-    /// </summary>
-    public static class OptionalExtensions
+    public static class OptionExtensions
     {
+        public static Option<T> ToOption<T>(this T value)
+        {
+            return value == null ?
+                Option<T>.None :
+                new Some<T>(value);
+        }
+
+        public static bool IsSome<T>(this Option<T> option)
+        {
+            return option is Some<T>;
+        }
+
+        public static bool IsNone<T>(this Option<T> option)
+        {
+            return option is None<T>;
+        }
+
         /// <summary>
-        /// If the Optional has a value then invoke the supplied action,
+        /// If the Option is Some then invoke the supplied action,
         /// otherwise do nothing.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="optional"></param>
+        /// <param name="option"></param>
         /// <param name="action"></param>
-        public static void Do<T>(this Optional<T> optional, Action<T> action)
+        public static void Do<T>(this Option<T> option, Action<T> action)
         {
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
 
-            if (optional.IsSome)
+            if (option.IsSome())
             {
-                action(optional.Value);
+                action(option.Value);
             }
         }
 
         /// <summary>
-        /// If the Optional has some value then call the
+        /// If the Option has some value then call the
         /// supplied function to return a result else
         /// return a default/alternate value
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TResult"></typeparam>
-        /// <param name="optional"></param>
+        /// <param name="option"></param>
         /// <param name="someValue"></param>
         /// <param name="noneValue"></param>
         /// <returns></returns>
-        public static TResult Match<T, TResult>(this Optional<T> optional,
+        public static TResult Match<T, TResult>(this Option<T> option,
             Func<T, TResult> someValue,
             TResult noneValue = default(TResult))
         {
@@ -48,79 +61,79 @@ namespace PutridParrot.Options
                 throw new ArgumentNullException(nameof(someValue));
             }
 
-            return optional.IsSome ? someValue(optional.Value) : noneValue;
+            return option.IsSome() ? someValue(option.Value) : noneValue;
         }
 
         /// <summary>
-        /// If the Optional has a value and the predicate returns true then 
-        /// returns the Optional otherwise returns an Optional.None
+        /// If the Option has a value and the predicate returns true then 
+        /// returns the Option otherwise returns a None
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="optional"></param>
+        /// <param name="option"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public static Optional<T> If<T>(this Optional<T> optional, Predicate<T> predicate)
+        public static Option<T> If<T>(this Option<T> option, Predicate<T> predicate)
         {
             if (predicate == null)
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
 
-            return optional.IsSome && predicate(optional.Value) ?
-                optional : Optional<T>.None;
+            return option.IsSome() && predicate(option.Value) ?
+                option : Option<T>.None;
         }
 
         /// <summary>
-        /// If the Optional has a value and the supplied condition is true,
-        /// returns the Optional otherwise returns and Optional.None
+        /// If the Option has a value and the supplied condition is true,
+        /// returns the Option otherwise returns a None
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="optional"></param>
+        /// <param name="option"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
-        public static Optional<T> If<T>(this Optional<T> optional, bool condition)
+        public static Option<T> If<T>(this Option<T> option, bool condition)
         {
-            return optional.IsSome && condition ?
-                optional : Optional<T>.None;
+            return option.IsSome() && condition ?
+                option : Option<T>.None;
         }
 
         /// <summary>
-        /// If the Optional has a value then the value is returned otherwise
+        /// If the Option has a value then the value is returned otherwise
         /// the supplied "other" value is returned
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="optional"></param>
+        /// <param name="option"></param>
         /// <param name="other"></param>
         /// <returns></returns>
-        public static T Or<T>(this Optional<T> optional, T other)
+        public static T Or<T>(this Option<T> option, T other)
         {
-            return optional.IsSome ? optional.Value : other;
+            return option.IsSome() ? option.Value : other;
         }
 
         /// <summary>
-        /// If the Optional has a value then the value is returned otherwise
+        /// If the Option has a value then the value is returned otherwise
         /// the supplied "other" function returns a value
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="optional"></param>
+        /// <param name="option"></param>
         /// <param name="other"></param>
         /// <returns></returns>
-        public static T Or<T>(this Optional<T> optional, Func<T> other)
+        public static T Or<T>(this Option<T> option, Func<T> other)
         {
-            return optional.IsSome ? optional.Value : other();
+            return option.IsSome() ? option.Value : other();
         }
 
         /// <summary>
-        /// If the Optional has no value then the exceptionFunc
+        /// If the Option has no value then the exceptionFunc
         /// is called to supply the Exception to be thrown
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TException"></typeparam>
-        /// <param name="optional"></param>
+        /// <param name="option"></param>
         /// <param name="exceptionFunc">The function that returns an instance of the exception
         /// which will be thrown. Must not be null</param>
         /// <returns></returns>
-        public static T OrException<T, TException>(this Optional<T> optional, Func<TException> exceptionFunc)
+        public static T OrException<T, TException>(this Option<T> option, Func<TException> exceptionFunc)
             where TException : Exception
         {
             if (exceptionFunc == null)
@@ -128,24 +141,24 @@ namespace PutridParrot.Options
                 throw new ArgumentNullException(nameof(exceptionFunc));
             }
 
-            if (optional.IsNone)
+            if (option.IsNone())
             {
                 throw exceptionFunc();
             }
 
-            return optional.Value;
+            return option.Value;
         }
 
         /// <summary>
         /// If a value exists, apply the mapping function to it, otherwise
-        /// return an empty Optional
+        /// return an empty Option
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="U"></typeparam>
-        /// <param name="optional"></param>
+        /// <param name="option"></param>
         /// <param name="mapper"></param>
         /// <returns></returns>
-        public static Optional<U> Map<T, U>(this Optional<T> optional,
+        public static Option<U> Map<T, U>(this Option<T> option,
             Func<T, U> mapper)
         {
             if (mapper == null)
@@ -153,35 +166,35 @@ namespace PutridParrot.Options
                 throw new ArgumentNullException(nameof(mapper));
             }
 
-            return optional.IsSome ?
-                mapper(optional.Value).ToOptional() :
-                Optional<U>.None;
+            return option.IsSome() ?
+                mapper(option.Value).ToOption() :
+                Option<U>.None;
         }
 
         /// <summary>
         /// If the value exists, apply the mapper to it, otherwise
-        /// return an empty Optional.
+        /// return an empty Option.
         /// 
-        /// This is similar to Map except that the mapper returns an Optional
+        /// This is similar to Map except that the mapper returns an Option
         /// and if it returns null a NullReferenceException is thrown
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="U"></typeparam>
-        /// <param name="optional"></param>
+        /// <param name="option"></param>
         /// <param name="mapper"></param>
         /// <returns></returns>
-        public static Optional<U> Map<T, U>(this Optional<T> optional,
-            Func<T, Optional<U>> mapper)
+        public static Option<U> Map<T, U>(this Option<T> option,
+            Func<T, Option<U>> mapper)
         {
             if (mapper == null)
             {
                 throw new ArgumentNullException(nameof(mapper));
             }
 
-            if (optional.IsNone)
-                return Optional<U>.None;
+            if (option.IsNone())
+                return Option<U>.None;
 
-            var result = mapper(optional.Value);
+            var result = mapper(option.Value);
             if (result == null)
             {
                 throw new NullReferenceException("mapper result cannot be null");
@@ -190,51 +203,52 @@ namespace PutridParrot.Options
         }
 
         /// <summary>
-        /// Converts a supplied value to an optional. If the
-        /// supplied value is null then an Optional.None is
-        /// returned
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static Optional<T> ToOptional<T>(this T value)
-        {
-            return value == null ? Optional<T>.None : new Optional<T>(value);
-        }
-
-        /// <summary>
-        /// Casts the value within the optional to a supplied type. If
+        /// Casts the value within the Option to a supplied type. If
         /// the type conversion is not possible an InvalidCastException
         /// is thrown.
         /// </summary>
         /// <typeparam name="TFrom"></typeparam>
         /// <typeparam name="TTo"></typeparam>
-        /// <param name="optional"></param>
+        /// <param name="option"></param>
         /// <returns></returns>
-        public static Optional<TTo> Cast<TFrom, TTo>(this Optional<TFrom> optional)
+        public static Option<TTo> Cast<TFrom, TTo>(this Option<TFrom> option)
             where TTo : class
         {
-            var cast = optional.Value as TTo;
+            var cast = option.Value as TTo;
             if (cast == null)
             {
-                throw new InvalidCastException($"Cannot cast {optional.Value.GetType().Name} to {typeof(TTo).Name}");
+                throw new InvalidCastException($"Cannot cast {option.Value.GetType().Name} to {typeof(TTo).Name}");
             }
-            return cast.ToOptional();
+            return cast.ToOption();
         }
 
         /// <summary>
         /// SafeCast is the same as a standard cast but no exception occurs, instead
-        /// a Optional.None would be returned for a cast failure.
+        /// a None would be returned for a cast failure.
         /// </summary>
         /// <typeparam name="TFrom"></typeparam>
         /// <typeparam name="TTo"></typeparam>
-        /// <param name="optional"></param>
+        /// <param name="option"></param>
         /// <returns></returns>
-        public static Optional<TTo> SafeCast<TFrom, TTo>(this Optional<TFrom> optional)
+        public static Option<TTo> SafeCast<TFrom, TTo>(this Option<TFrom> option)
             where TTo : class
         {
-            var cast = optional.Value as TTo;
-            return cast.ToOptional();
+            var cast = option.Value as TTo;
+            return cast.ToOption();
         }
+
+        /// <summary>
+        /// Gets the value from the Option if it exists or returns
+        /// the supplied default value of default of T if no arguments
+        /// is supplied
+        /// </summary>
+        /// <param name="option"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public static T GetValueOfDefault<T>(this Option<T> option, T defaultValue = default(T))
+        {
+            return option.IsSome() ? option.Value : defaultValue;
+        }
+
     }
 }

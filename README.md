@@ -43,3 +43,8 @@ that using the Value property which will throw an exception if you try to get th
 
 _Note: Many of these methods can easily be replicated with If and other logic statements in C#, but using these methods should remove 
 the need for such checks and supply more readable code._
+
+# Option&lt;T&gt;
+
+The Option class is made to be usable in pattern matching ways and so a little more similar to F#'s Option. Extension 
+methods have been added duplicating Optional functionality to extend the functional capabilities.

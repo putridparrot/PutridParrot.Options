@@ -45,7 +45,7 @@ namespace PutridParrot.Options
         /// <summary>
         /// Gets the value stored within the Optional.
         /// If the value is not present (i.e. null) a
-        /// NullReferenceException is thrown
+        /// InvalidOperationException is thrown
         /// </summary>
         public T Value
         {
