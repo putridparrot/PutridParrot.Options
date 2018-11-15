@@ -31,16 +31,6 @@ namespace Tests.PutridParrot.Options
         }
 
         [Test]
-        public void GetValueFromNoneExpectException()
-        {
-            var none = Option<Person>.None;
-            Assert.Throws<InvalidOperationException>(() =>
-            {
-                var p = none.Value;
-            });
-        }
-
-        [Test]
         public void SomeInPatternMatchSwitch()
         {
             var option = new Person().ToOption();
@@ -376,7 +366,15 @@ namespace Tests.PutridParrot.Options
         {
             var option = "Hello World".ToOption();
 
-            Assert.That(option.Value, Is.EqualTo("Hello World"));
+            switch (option)
+            {
+                case Some<string> some:
+                    Assert.That(some.Value, Is.EqualTo("Hello World"));
+                    break;
+                default:
+                    Assert.Fail();
+                    break;
+            }
         }
 
         [Test]
@@ -503,6 +501,15 @@ namespace Tests.PutridParrot.Options
             var o = "Hello World".ToOption();
 
             Assert.Throws<ArgumentNullException>(() => o.Match((Func<string, int>)null));
+        }
+
+        [Test]
+        public void CompareAnyTwoNoneOptionsShouldBeTheSame()
+        {
+            var noneString = ((string) null).ToOption();
+            var nonePerson = ((Person) null).ToOption();
+
+            Assert.AreEqual(noneString, nonePerson);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 
 namespace PutridParrot.Options
 {
@@ -35,9 +36,9 @@ namespace PutridParrot.Options
                 throw new ArgumentNullException(nameof(action));
             }
 
-            if (option.IsSome())
+            if (option is Some<T> some)
             {
-                action(option.Value);
+                action(some.Value);
             }
         }
 
@@ -61,7 +62,7 @@ namespace PutridParrot.Options
                 throw new ArgumentNullException(nameof(someValue));
             }
 
-            return option.IsSome() ? someValue(option.Value) : noneValue;
+            return option is Some<T> some ? someValue(some.Value) : noneValue;
         }
 
         /// <summary>
@@ -79,7 +80,7 @@ namespace PutridParrot.Options
                 throw new ArgumentNullException(nameof(predicate));
             }
 
-            return option.IsSome() && predicate(option.Value) ?
+            return option is Some<T> some && predicate(some.Value) ?
                 option : Option<T>.None;
         }
 
@@ -107,7 +108,7 @@ namespace PutridParrot.Options
         /// <returns></returns>
         public static T Or<T>(this Option<T> option, T other)
         {
-            return option.IsSome() ? option.Value : other;
+            return option is Some<T> some ? some.Value : other;
         }
 
         /// <summary>
@@ -120,7 +121,7 @@ namespace PutridParrot.Options
         /// <returns></returns>
         public static T Or<T>(this Option<T> option, Func<T> other)
         {
-            return option.IsSome() ? option.Value : other();
+            return option is Some<T> some ? some.Value : other();
         }
 
         /// <summary>
@@ -141,12 +142,13 @@ namespace PutridParrot.Options
                 throw new ArgumentNullException(nameof(exceptionFunc));
             }
 
-            if (option.IsNone())
+            switch (option)
             {
-                throw exceptionFunc();
+                case Some<T> some:
+                    return some.Value;
+                default:
+                    throw exceptionFunc();
             }
-
-            return option.Value;
         }
 
         /// <summary>
@@ -166,8 +168,8 @@ namespace PutridParrot.Options
                 throw new ArgumentNullException(nameof(mapper));
             }
 
-            return option.IsSome() ?
-                mapper(option.Value).ToOption() :
+            return option is Some<T> some ?
+                mapper(some.Value).ToOption() :
                 Option<U>.None;
         }
 
@@ -191,15 +193,18 @@ namespace PutridParrot.Options
                 throw new ArgumentNullException(nameof(mapper));
             }
 
-            if (option.IsNone())
-                return Option<U>.None;
-
-            var result = mapper(option.Value);
-            if (result == null)
+            switch (option)
             {
-                throw new NullReferenceException("mapper result cannot be null");
+                case Some<T> some:
+                    var result = mapper(some.Value);
+                    if (result == null)
+                    {
+                        throw new NullReferenceException("mapper result cannot be null");
+                    }
+                    return result;
+                default:
+                    return Option<U>.None;
             }
-            return result;
         }
 
         /// <summary>
@@ -214,12 +219,18 @@ namespace PutridParrot.Options
         public static Option<TTo> Cast<TFrom, TTo>(this Option<TFrom> option)
             where TTo : class
         {
-            var cast = option.Value as TTo;
-            if (cast == null)
+            switch (option)
             {
-                throw new InvalidCastException($"Cannot cast {option.Value.GetType().Name} to {typeof(TTo).Name}");
-            }
-            return cast.ToOption();
+                case Some<TFrom> some:
+                    var cast = some.Value as TTo;
+                    if (cast == null)
+                    {
+                        throw new InvalidCastException($"Cannot cast {some.Value.GetType().Name} to {typeof(TTo).Name}");
+                    }
+                    return cast.ToOption();
+                default:
+                    return Option<TTo>.None;
+            }          
         }
 
         /// <summary>
@@ -233,8 +244,18 @@ namespace PutridParrot.Options
         public static Option<TTo> SafeCast<TFrom, TTo>(this Option<TFrom> option)
             where TTo : class
         {
-            var cast = option.Value as TTo;
-            return cast.ToOption();
+            switch (option)
+            {
+                case Some<TFrom> some:
+                    var cast = some.Value as TTo;
+                    if (cast == null)
+                    {
+                        return Option<TTo>.None;
+                    }
+                    return cast.ToOption();
+                default:
+                    return Option<TTo>.None;
+            }
         }
 
         /// <summary>
@@ -247,8 +268,7 @@ namespace PutridParrot.Options
         /// <returns></returns>
         public static T GetValueOfDefault<T>(this Option<T> option, T defaultValue = default(T))
         {
-            return option.IsSome() ? option.Value : defaultValue;
+            return option is Some<T> some ? some.Value : defaultValue;
         }
-
     }
 }

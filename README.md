@@ -52,3 +52,8 @@ that using the Value property which will throw an exception if you try to get th
 _Note: Many of these methods can easily be replicated with If and other logic statements in C#, but using these methods should remove 
 the need for such checks and supply more readable code._
 
+# Result&lt;T&gt;
+
+The Result class is the base for the Success and Failure classes, it's aimed (in a similar way to Option) to be used within
+pattern matching etc. 
+
