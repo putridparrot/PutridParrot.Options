@@ -1,9 +1,18 @@
-export class Option {
+/**
+ * Option type, can be a None or Some
+ */
+export abstract class Option {
 }
 
+/**
+ * A None type (named _None as shouldn't be used directly)
+ */
 class _None extends Option {    
 }
 
+/**
+ * A Some object has a non-null/non-undefined value
+ */
 export class Some<T> extends Option {
     constructor(private value: T) {        
         super();
@@ -14,8 +23,14 @@ export class Some<T> extends Option {
     }    
 }
 
+/**
+ * A module/singleton for a None value
+ */
 export let None = new _None();
 
+/**
+ * Option methods
+ */
 export class Options {
     public static toOption<T>(value: any): Option {
         return !Options.hasValue(value) ?
