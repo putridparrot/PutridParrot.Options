@@ -7,18 +7,18 @@ export abstract class Option {
 /**
  * A None type (named _None as shouldn't be used directly)
  */
-class _None extends Option {    
+class InternalNone extends Option {    
 }
 
 /**
  * A Some object has a non-null/non-undefined value
  */
 export class Some<T> extends Option {
-    constructor(private value: T) {        
+    public constructor(private value: T) {        
         super();
     }
 
-    public get Value() : T {
+    public get Value(): T {
         return this.value;
     }    
 }
@@ -26,7 +26,7 @@ export class Some<T> extends Option {
 /**
  * A module/singleton for a None value
  */
-export let None = new _None();
+export let None = new InternalNone();
 
 /**
  * Option methods
@@ -39,7 +39,7 @@ export class Options {
     }
 
     public static hasValue(value: any): boolean {
-        return value != undefined && value != null ;
+        return value !== undefined && value !== null ;
     }
 
     public static isOption(value: any): boolean {
@@ -51,7 +51,7 @@ export class Options {
     }
 
     public static isNone(option: Option): boolean {
-        return option instanceof _None;
+        return option instanceof InternalNone;
     }
 
     /**
@@ -60,7 +60,7 @@ export class Options {
      * @param value 
      * @param defaultValue 
      */
-    public static getValueOrDefault<T>(value: any | Option, defaultValue: any) {
+    public static getValueOrDefault<T>(value: any | Option, defaultValue: any): T {
         if(Options.hasValue(value)) {
             if(Options.isSome(value)) {
                 let s = value as Some<T>;
@@ -80,7 +80,7 @@ export class Options {
      * @param option 
      * @param action 
      */
-    public static do<T>(option: Option, action: (value: T) => void) {
+    public static do<T>(option: Option, action: (value: T) => void): void {
         if(Options.isSome(option)) {
             let s = option as Some<T>;
             action(s.Value);
@@ -118,9 +118,9 @@ export class Options {
 
         let result = false;
         if(conditionOrPredicate instanceof Function) {
-             let s = option as Some<T>;
-             let f = conditionOrPredicate as (value: T) => boolean;
-             result = f(s.Value);
+            let s = option as Some<T>;
+            let f = conditionOrPredicate as (value: T) => boolean;
+            result = f(s.Value);
         }
         else {
             result = conditionOrPredicate;
