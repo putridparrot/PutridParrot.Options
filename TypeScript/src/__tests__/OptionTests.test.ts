@@ -1,72 +1,72 @@
-import { Options, None, Some } from "../Option";
+import { Option, None, Some } from "../Option";
 
 it('Option toOption with undefined, expect None', () => {
 
-    let o = Options.toOption(undefined);
+    let o = Option.toOption(undefined);
 
     expect(o).toBe(None);
 });
 
 it('Option toOption with null, expect None', () => {
     
-    let o = Options.toOption(null);
+    let o = Option.toOption(null);
 
     expect(o).toBe(None);
 });
 
 it('Option toOption with value, expect Some', () => {
     
-    let o = Options.toOption("Hello World");
+    let o = Option.toOption("Hello World");
     
     expect(o).toBeInstanceOf(Some);
 });
 
 it('Option toOption with value, expect correct value from Some', () => {
     
-    let o = Options.toOption("Hello World") as Some<string>;   
+    let o = Option.toOption("Hello World") as Some<string>;   
     
     expect(o.Value).toBe("Hello World");
 });
 
 it('Option isSome when it is None', () => {
 
-    let o = Options.toOption(undefined);   
+    let o = Option.toOption(undefined);   
 
-    expect(Options.isSome(o)).toBeFalsy();
+    expect(Option.isSome(o)).toBeFalsy();
 });
 
 it('Option isSome when it is Some', () => {
     
-    let o = Options.toOption("Hello World");   
+    let o = Option.toOption("Hello World");   
 
-    expect(Options.isSome(o)).toBeTruthy();
+    expect(Option.isSome(o)).toBeTruthy();
 });
 
 it('Option getValueOrDefault with undefined, expect default', () => {
     
-    expect(Options.getValueOrDefault(undefined, "Scooby")).toBe("Scooby");
+    expect(Option.getValueOrDefault(undefined, "Scooby")).toBe("Scooby");
 });
 
 it('Option getValueOrDefault with null, expect default', () => {
     
-    expect(Options.getValueOrDefault(null, "Scooby")).toBe("Scooby");
+    expect(Option.getValueOrDefault(null, "Scooby")).toBe("Scooby");
 });
 
 it('Option getValueOrDefault with None, expect default', () => {
     
-    expect(Options.getValueOrDefault(None, "Scooby")).toBe("Scooby");
+    expect(Option.getValueOrDefault(None, "Scooby")).toBe("Scooby");
 });
 
 it('Option getValueOrDefault with Some, expect value', () => {
     
-    expect(Options.getValueOrDefault(new Some("Scooby"), "Doo")).toBe("Scooby");
+    expect(Option.getValueOrDefault(new Some("Scooby"), "Doo")).toBe("Scooby");
 });
 
 it('Option do with None, expect no calls to action', () => {
 
     let a = jest.fn((s: string) => {});
 
-    Options.do(None, a);
+    Option.do(None, a);
 
     expect(a).not.toHaveBeenCalled();
 });
@@ -75,92 +75,93 @@ it('Option do with Some, expect action to be called', () => {
 
     let a = jest.fn((s: string) => {});
 
-    Options.do(Options.toOption("Scooby"), a);
+    Option.do(Option.toOption("Scooby"), a);
 
     expect(a).toHaveBeenCalledTimes(1);
 });
 
-it('Option match with None, but no default, expect null', () => {
+it('Option ifElse with None, but no default, expect None', () => {
 
-    let result = Options.match<string, string>(None, value => {return ""});
+    let result = Option.ifElse<string, string | undefined>(None, value => undefined);
 
-    expect(result).toBe(null);
+    expect(result).toBe(None);
+});
+
+it('Option ifElse with None, with default, expect default', () => {
+
+    let result = Option.ifElse<string, string>(None, value => "", "Scooby");
+
+    expect((result as Some<string>).Value).toBe("Scooby");
+});
+
+it('Option ifElse with Some, expect someValue function return', () => {
+
+    let result = Option.ifElse<string, string>(Option.toOption("None"), value => "Scooby", "Doo");
+
+    expect((result as Some<string>).Value).toBe("Scooby");
+});
+
+it('Option match with None, but no default, expect undefined', () => {
+
+    let result = Option.match<string, string | undefined>(None, value => undefined);
+
+    expect(result).toBe(undefined);
 });
 
 it('Option match with None, with default, expect default', () => {
 
-    let result = Options.match<string, string>(None, value => {return ""}, "Scooby");
+    let result = Option.match<string, string>(None, value => "", "Scooby");
 
     expect(result).toBe("Scooby");
 });
 
 it('Option match with Some, expect someValue function return', () => {
 
-    let result = Options.match<string, string>(Options.toOption("None"), value => {return "Scooby"}, "Doo");
+    let result = Option.match<string, string>(Option.toOption("None"), value => "Scooby", "Doo");
 
     expect(result).toBe("Scooby");
 });
 
+
 it('Option if with None, expect None return', () => {
 
-    let result = Options.if(None, true);
+    let result = Option.if(None, true);
 
-    expect(Options.isNone(result)).toBeTruthy();
+    expect(Option.isNone(result)).toBeTruthy();
 });
 
 it('Option if with Some and condition false, expect None return', () => {
 
-    let result = Options.if(Options.toOption("Scooby"), false);
+    let result = Option.if(Option.toOption("Scooby"), false);
 
-    expect(Options.isNone(result)).toBeTruthy();
+    expect(Option.isNone(result)).toBeTruthy();
 });
 
 it('Option if with Some and predicate false, expect None return', () => {
 
-    let result = Options.if<string>(Options.toOption("Scooby"), (value: string) => { return false; });
+    let result = Option.if<string>(Option.toOption("Scooby"), (value: string) => { return false; });
 
-    expect(Options.isNone(result)).toBeTruthy();
+    expect(Option.isNone(result)).toBeTruthy();
 });
 
 it('Option if with Some and condition true, expect Some return', () => {
 
-    let result = Options.if(Options.toOption("Scooby"), true);
+    let result = Option.if(Option.toOption("Scooby"), true);
 
-    expect(Options.isSome(result)).toBeTruthy();
+    expect(Option.isSome(result)).toBeTruthy();
 });
 
 it('Option if with Some and predicate true, expect Some return', () => {
 
-    let result = Options.if<string>(Options.toOption("Scooby"), (value: string) => { return true; });
+    let result = Option.if<string>(Option.toOption("Scooby"), (value: string) => { return true; });
 
-    expect(Options.isSome(result)).toBeTruthy();
-});
-
-it('Option or with None expect other return', () => {
-
-    let result = Options.or<string>(None, "Scooby");
-
-    expect(result).toBe("Scooby");
-});
-
-it('Option or with None expect other function return', () => {
-
-    let result = Options.or<string>(None, () => "Scooby");
-
-    expect(result).toBe("Scooby");
-});
-
-it('Option or with Some expect some return', () => {
-
-    let result = Options.or<string>(Options.toOption("Scooby"), "Doo");
-
-    expect(result).toBe("Scooby");
+    expect(Option.isSome(result)).toBeTruthy();
 });
 
 it('Option orError with None expect Error', () => {
 
     const t = () => {
-        Options.orError<string>(None, () => new Error());
+        Option.orError<string>(None, () => new Error());
     };
 
     expect(t).toThrow(Error);
@@ -168,7 +169,8 @@ it('Option orError with None expect Error', () => {
 
 it('Option orError with Some expect value', () => {
 
-    let result = Options.orError<string>(Options.toOption("Scooby"), () => new Error());
+    let result = Option.orError<string>(Option.toOption("Scooby"), () => new Error());
 
     expect(result).toBe("Scooby");
 });
+
