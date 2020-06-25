@@ -1,5 +1,7 @@
 # PutridParrot.Options
 
+[![Build status](https://ci.appveyor.com/api/projects/status/jugva0k23dt93wgw?svg=true)](https://ci.appveyor.com/project/putridparrot/putridparrot-options)
+
 # Option&lt;T&gt;
 
 The Option class is made to be usable in pattern matching ways and so a little more similar to F#'s Option. Extension 
